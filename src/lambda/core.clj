@@ -1,9 +1,16 @@
 (ns lambda.core
   (:require
-    [lambda.impl.runtime :as runtime]))
+    [lambda.impl.runtime :as runtime]
+    [babashka.pods :as pods]))
+
+; (pods/load-pod 'org.babashka/aws "0.0.5")
+(pods/load-pod "./pod-babashka-aws")
+(require '[pod.babashka.aws :as aws])
 
 (defn my-assoc [m k v]
-  (assoc m k v))
+  (let [s3-client (aws/client {:api :s3 :region "us-east-1"})]
+    (assoc m k v
+          :bucket (aws/invoke s3-client {:op :ListBuckets}))))
 
 (defn -main [& _]
   (let [k :test

@@ -15,12 +15,14 @@ COPY deps.edn deps.edn
 
 COPY src/ src/
 COPY resources/ resources/
+COPY pod-babashka-aws pod-babashka-aws
+RUN chmod +x pod-babashka-aws
 
-RUN clojure -Sdeps '{:mvn/local-repo "./.m2/repository"}' -Spath > cp
-RUN ./bb -cp $(cat cp) -m lambda.core --uberscript core.clj
-RUN zip -q -r function.zip bb bootstrap core.clj
+# RUN clojure -Sdeps '{:mvn/local-repo "./.m2/repository"}' -Spath > cp
+# RUN ./bb -cp $(cat cp) -m lambda.core --uberscript core.clj
+# RUN zip -q -r function.zip bb bootstrap core.clj
 
 # Or, e.g. if you also want to include a pod:
-# RUN clojure -A:remove-clojure -Sdeps '{:mvn/local-repo "./.m2/repository"}' -Spath > cp
-# RUN ./bb -cp $(cat cp) -m lambda.core --uberjar lambda.jar
-# RUN zip -q -r function.zip bb bootstrap lambda.jar # + any pods you downloaded
+RUN clojure -A:remove-clojure -Sdeps '{:mvn/local-repo "./.m2/repository"}' -Spath > cp
+RUN ./bb -cp $(cat cp) -m lambda.core --uberjar lambda.jar
+RUN zip -q -r function.zip bb bootstrap lambda.jar pod-babashka-aws
